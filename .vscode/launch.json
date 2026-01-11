@@ -1,0 +1,20 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Microsoft cloud sandbox",
+            "request": "launch",
+            "type": "al",
+            "environmentType": "Sandbox",
+            "environmentName": "UAE",
+            "tenant": "fa10e970-6172-4354-9d14-5b78b03a3346",
+            // "startupObjectId": 22,
+            // "startupObjectType": "Page",
+            "breakOnError": "All",
+            "launchBrowser": true,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+           // "schemaUpdateMode": "ForceSync"
+        }
+    ]
+}

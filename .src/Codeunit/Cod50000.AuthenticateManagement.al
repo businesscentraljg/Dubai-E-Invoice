@@ -15,18 +15,24 @@ codeunit 50000 "Authenticate Management"
         if not InvoiceSetup.Get() then
             Error('Invoice Setup not found.');
 
-        // Build request JSON
+        //CHECK: Token still valid?
+        if (InvoiceSetup."Bearer Token" <> '') and
+           (InvoiceSetup."Token Expiry" > CurrentDateTime()) then begin
+            exit(InvoiceSetup."Bearer Token");
+        end;
+
+        //Build request JSON
         JsonRequest.Add('Login', InvoiceSetup.Login);
         JsonRequest.Add('Password', InvoiceSetup."Password");
         JsonRequest.WriteTo(RequestBody);
 
-        // Prepare HTTP content
+        //Prepare HTTP content
         RequestContent.WriteFrom(RequestBody);
         RequestContent.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
         ContentHeaders.Add('Content-Type', 'application/json');
 
-        // Call API
+        //Call API
         if not Client.Post(InvoiceSetup."Base URL" + '/api/v1/auth', RequestContent, ResponseMessage) then
             Error('Failed to connect to token API.');
 

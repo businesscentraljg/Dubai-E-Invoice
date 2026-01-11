@@ -1,6 +1,20 @@
 codeunit 50000 "Authenticate Management"
 {
-    procedure GenerateToken(): Text
+    procedure GetValidToken(): Text
+    var
+        InvoiceSetup: Record "Invoice Setup";
+    begin
+        if not InvoiceSetup.Get() then
+            Error('Invoice Setup not found.');
+
+        if (InvoiceSetup."Bearer Token" <> '') and
+           (InvoiceSetup."Token Expiry" > CurrentDateTime()) then
+            exit(InvoiceSetup."Bearer Token");
+
+        exit(GenerateToken());
+    end;
+
+    local procedure GenerateToken(): Text
     var
         InvoiceSetup: Record "Invoice Setup";
         Client: HttpClient;
@@ -14,12 +28,6 @@ codeunit 50000 "Authenticate Management"
     begin
         if not InvoiceSetup.Get() then
             Error('Invoice Setup not found.');
-
-        //CHECK: Token still valid?
-        if (InvoiceSetup."Bearer Token" <> '') and
-           (InvoiceSetup."Token Expiry" > CurrentDateTime()) then begin
-            exit(InvoiceSetup."Bearer Token");
-        end;
 
         //Build request JSON
         JsonRequest.Add('Login', InvoiceSetup.Login);

@@ -50,12 +50,13 @@ page 50000 "Invoice Setup"
                 PromotedCategory = Process;
                 PromotedIsBig = true;
                 ToolTip = 'Executes the Generate Token action.';
+                Visible = false;
                 trigger OnAction()
                 var
                     CU: Codeunit "Authenticate Management";
                 begin
                     if not Confirm('Do you want to Genrate Token?') then exit;
-                    CU.GenerateToken();
+                    CU.GetValidToken();
                 end;
             }
         }

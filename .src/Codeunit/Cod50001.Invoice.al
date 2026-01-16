@@ -66,8 +66,6 @@ codeunit 50001 "Invoice"
 
         Request.GetHeaders(Headers);
 
-        // ✅ CLEAN TOKEN
-        // Token := DelChr(Token, '<>', ' ' + Format(13) + Format(10));
 
         Headers.Remove('Authorization');
         Headers.Add('Authorization', StrSubstNo('Bearer %1', Token));

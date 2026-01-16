@@ -1,7 +1,8 @@
-table 50001 Subscription
+table 50001 "User Subscription"
 {
-    Caption = 'Subscription';
+    Caption = 'UserSubscription';
     DataClassification = ToBeClassified;
+    LookupPageId = "User Subscription";
 
     fields
     {
@@ -86,6 +87,12 @@ table 50001 Subscription
         key(PK; "Config Id")
         {
             Clustered = true;
+        }
+    }
+    fieldgroups
+    {
+        fieldgroup(DropDown; "Config Id", "Config Type")
+        {
         }
     }
 }

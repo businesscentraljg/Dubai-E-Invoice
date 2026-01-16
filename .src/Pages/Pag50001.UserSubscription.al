@@ -1,11 +1,11 @@
-page 50001 Subscription
+page 50001 "User Subscription"
 {
     ApplicationArea = All;
-    Caption = 'Subscription';
+    Caption = 'User Subscription';
     PageType = List;
-    SourceTable = Subscription;
+    SourceTable = "User Subscription";
     UsageCategory = Lists;
-    
+
     layout
     {
         area(Content)

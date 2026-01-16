@@ -59,31 +59,20 @@ codeunit 50003 "Subscription API Import"
         for I := 0 to JsonArr.Count() - 1 do begin
             JsonArr.Get(I, ItemToken);
             JsonObj := ItemToken.AsObject();
-            IpsertSubscription(JsonObj);
+            InsertSubscription(JsonObj);
         end;
     end;
 
-    local procedure IpsertSubscription(JsonObj: JsonObject)
+    local procedure InsertSubscription(JsonObj: JsonObject)
     var
-        SubRec: Record Subscription;
+        SubRec: Record "User Subscription";
         SourcePartner: JsonObject;
         DestPartner: JsonObject;
-        ConfigId: Integer;
-        IsNew: Boolean;
         SourcePartnerToken: JsonToken;
         DestPartnerToken: JsonToken;
-
     begin
-        ConfigId := GetInt(JsonObj, 'ConfigId');
-
-        if SubRec.Get(ConfigId) then
-            IsNew := false
-        else begin
-            SubRec.Init();
-            SubRec."Config Id" := ConfigId;
-            IsNew := true;
-        end;
-
+        SubRec.Init();
+        SubRec."Config Id" := GetInt(JsonObj, 'ConfigId');
         SubRec."Config Type" := GetInt(JsonObj, 'ConfigType');
         SubRec."Spec Business Type" := GetText(JsonObj, 'SpecificationBusinessType');
         SubRec."Spec Type" := GetText(JsonObj, 'SpecificationType');
@@ -108,10 +97,8 @@ codeunit 50003 "Subscription API Import"
             SubRec."Destination Qualifier" := GetText(DestPartner, 'Qualifier');
         end;
 
-        if IsNew then
-            SubRec.Insert()
-        else
-            SubRec.Modify();
+        if not SubRec.Get(SubRec."Config Id") then
+            SubRec.Insert();
     end;
 
     local procedure GetText(JObj: JsonObject; Name: Text): Text

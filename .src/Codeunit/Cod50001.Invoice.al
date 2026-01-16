@@ -1,6 +1,6 @@
 codeunit 50001 "Invoice"
 {
-    Permissions = tabledata "Sales Invoice Header" = rimd;
+    Permissions = tabledata "Sales Invoice Header" = RIMD;
     procedure SendPostedSalesInvoice(var SIH: Record "Sales Invoice Header")
     var
         AuthCU: Codeunit "Authenticate Management";
@@ -23,6 +23,7 @@ codeunit 50001 "Invoice"
         DocsArray: JsonArray;
         DocObj: JsonObject;
         ResponseText: Text;
+        ControlNumber: Text;
     begin
         if SIH."Invoice Send" then
             Error('Invoice %1 already sent.', SIH."No.");
@@ -44,7 +45,10 @@ codeunit 50001 "Invoice"
         // XML
         XmlBody := GenerateInvoiceXML(SIH);
         // JSON
-        DocObj.Add('ControlNumber', Format(CreateGuid()));
+
+        ControlNumber := Format(CreateGuid());
+
+        DocObj.Add('ControlNumber', ControlNumber);
         DocObj.Add('Content', XmlBody);
         DocObj.Add('CompressType', 'NONE');
 
@@ -96,6 +100,7 @@ codeunit 50001 "Invoice"
 
             SIH."Invoice Send" := true;
             SIH."Invoice Send DateTime" := CurrentDateTime();
+            SIH."Control Number" := ControlNumber;
             SIH.Modify();
         end;
     end;
@@ -117,4 +122,98 @@ codeunit 50001 "Invoice"
         InStr.Read(XmlText);
         exit(XmlText);
     end;
+
+    procedure CheckPostedSalesInvoiceSentStatus(var SIH: Record "Sales Invoice Header")
+    var
+        Setup: Record "Invoice Setup";
+        UserSetup: Record "User Setup";
+        UserSubscription: Record "User Subscription";
+        Client: HttpClient;
+        Request: HttpRequestMessage;
+        Response: HttpResponseMessage;
+        Content: HttpContent;
+        Headers: HttpHeaders;
+        JsonRequest: JsonObject;
+        JsonResponse: JsonObject;
+        ResponseText: Text;
+        Url: Text;
+        Status: Boolean;
+        SubmissionId: Text;
+        StatusToken: JsonToken;
+        SubmissionToken: JsonToken;
+        AuthCU: Codeunit "Authenticate Management";
+    begin
+        SIH.TestField("Control Number");
+        if not Setup.Get() then
+            Error('Invoice Setup not found');
+
+        if not UserSetup.Get(UserId) then
+            Error('User Setup not found for %1.', UserId);
+
+        if UserSetup."Subscription Config Id" = 0 then
+            Error('Subscription Config Id not defined in User Setup.');
+
+        if not UserSubscription.Get(UserSetup."Subscription Config Id") then
+            Error('No Subscription found for Config Id %1.', UserSetup."Subscription Config Id");
+
+        // URL
+        Url := Setup."Base URL" + '/api/v1/documents/sent/check';
+
+        // JSON Body
+        JsonRequest.Add('ConfigId', UserSubscription."Config Id");
+        JsonRequest.Add('ConfigType', UserSubscription."Config Type");
+        JsonRequest.Add('ControlNumber', SIH."Control Number");
+
+        JsonRequest.WriteTo(ResponseText);
+        Content.WriteFrom(ResponseText);
+
+        Content.GetHeaders(Headers);
+        Headers.Clear();
+        Headers.Add('Content-Type', 'application/json');
+
+        // Request
+        Request.SetRequestUri(Url);
+        Request.Method := 'POST';
+        Request.Content := Content;
+
+        Request.GetHeaders(Headers);
+        Headers.Add('Authorization', 'Bearer ' + AuthCU.GetValidToken());
+
+        // Send
+        if not Client.Send(Request, Response) then
+            Error('Unable to reach sent status API');
+
+        // Check HTTP status
+        if not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            Error('Send failed. HTTP %1\%2', Response.HttpStatusCode(), ResponseText);
+        end;
+
+        // Read response content FIRST
+        Response.Content.ReadAs(ResponseText);
+
+        if Setup."Show Message" then
+            Message(ResponseText);
+
+        // Parse response JSON
+        if not JsonResponse.ReadFrom(ResponseText) then
+            Error('Invalid JSON response from sent status API');
+
+        // ---- SAFE JSON access ----
+        if JsonResponse.Get('Status', StatusToken) then
+            Status := StatusToken.AsValue().AsBoolean()
+        else
+            Error('Response does not contain Status field.');
+
+        if JsonResponse.Get('SubmissionId', SubmissionToken) then
+            SubmissionId := SubmissionToken.AsValue().AsText()
+        else
+            SubmissionId := '';
+
+        // Update Sales Invoice
+        SIH."Sent Status" := Status;
+        SIH."Submission Id" := SubmissionId;
+        SIH.Modify();
+    end;
+
 }

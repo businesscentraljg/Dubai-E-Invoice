@@ -63,6 +63,18 @@ page 50000 "Invoice Setup"
                     CU.GetValidToken();
                 end;
             }
+            action(ImportSubscriptions)
+            {
+                Caption = 'Import Subscriptions';
+                Image = Import;
+                trigger OnAction()
+                var
+                    SubAPI: Codeunit "Subscription API Import";
+                begin
+                    SubAPI.ImportSubscriptions();
+                    Message('Subscriptions imported successfully.');
+                end;
+            }
         }
     }
     trigger OnOpenPage()

@@ -4,6 +4,8 @@ codeunit 50001 "Invoice"
     procedure SendPostedSalesInvoice(var SIH: Record "Sales Invoice Header")
     var
         AuthCU: Codeunit "Authenticate Management";
+        UserSubscription: Record "User Subscription";
+        UserSetup: Record "User Setup";
         Client: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
@@ -31,6 +33,14 @@ codeunit 50001 "Invoice"
         // Token
         Token := AuthCU.GetValidToken();
 
+        if not UserSetup.Get(UserId) then
+            Error('User Setup not found for %1.', UserId);
+
+        if UserSetup."Subscription Config Id" = 0 then
+            Error('Subscription Config Id not defined in User Setup.');
+
+        if not UserSubscription.Get(UserSetup."Subscription Config Id") then
+            Error('No Subscription found for Config Id %1.', UserSetup."Subscription Config Id");
         // XML
         XmlBody := GenerateInvoiceXML(SIH);
         // JSON
@@ -40,8 +50,8 @@ codeunit 50001 "Invoice"
 
         DocsArray.Add(DocObj);
 
-        JsonObj.Add('ConfigType', 1);
-        JsonObj.Add('ConfigId', 119415);
+        JsonObj.Add('ConfigType', UserSubscription."Config Type");
+        JsonObj.Add('ConfigId', UserSetup."Subscription Config Id");
         JsonObj.Add('Documents', DocsArray);
         JsonObj.WriteTo(JsonBody);
 

@@ -38,6 +38,23 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                     CU.SendPostedSalesInvoice(Rec);
                 end;
             }
+            action("Download Sales Invoice XML")
+            {
+                ApplicationArea = All;
+                Caption = 'Download XML';
+                ToolTip = 'Download XML';
+                Image = Download;
+                Promoted = true;
+                PromotedCategory = Process;
+                PromotedIsBig = true;
+
+                trigger OnAction()
+                var
+                    Invoice: Codeunit "Download XML";
+                begin
+                    Invoice.DownloadInvoice(Rec."No.");
+                end;
+            }
         }
     }
 }

@@ -1,21 +1,26 @@
 codeunit 50001 "Invoice"
 {
+    Permissions = tabledata "Sales Invoice Header" = rimd;
     procedure SendPostedSalesInvoice(var SIH: Record "Sales Invoice Header")
     var
-        CU: Codeunit "Authenticate Management";
+        AuthCU: Codeunit "Authenticate Management";
         Client: HttpClient;
         Request: HttpRequestMessage;
         Response: HttpResponseMessage;
         Content: HttpContent;
         Headers: HttpHeaders;
-        Token: Text;
-        XmlBody: Text;
+        ContentHeaders: HttpHeaders;
         Setup: Record "Invoice Setup";
         TempBlob: Codeunit "Temp Blob";
         OutStr: OutStream;
         InStr: InStream;
-        ToFile: Text;
-        ContentHeaders: HttpHeaders;
+        Token: Text;
+        XmlBody: Text;
+        JsonBody: Text;
+        JsonObj: JsonObject;
+        DocsArray: JsonArray;
+        DocObj: JsonObject;
+        ResponseText: Text;
     begin
         if SIH."Invoice Send" then
             Error('Invoice %1 already sent.', SIH."No.");
@@ -23,136 +28,85 @@ codeunit 50001 "Invoice"
         if not Setup.Get() then
             Error('Invoice Setup not found.');
 
-        // 1️⃣ Get token
-        Token := CU.GetValidToken();
+        // Token
+        Token := AuthCU.GetValidToken();
 
-        // 2️⃣ Build XML from Posted Sales Invoice
-        XmlBody := BuildInvoiceXmlFromPSI(SIH);
+        // XML
+        XmlBody := GenerateInvoiceXML(SIH);
+        // JSON
+        DocObj.Add('ControlNumber', Format(CreateGuid()));
+        DocObj.Add('Content', XmlBody);
+        DocObj.Add('CompressType', 'NONE');
 
-        // 3️⃣ Prepare HTTP content
-        Content.WriteFrom(XmlBody);
+        DocsArray.Add(DocObj);
+
+        JsonObj.Add('ConfigType', 1);
+        JsonObj.Add('ConfigId', 119415);
+        JsonObj.Add('Documents', DocsArray);
+        JsonObj.WriteTo(JsonBody);
+
+        if Setup."Show Message" then
+            Message(JsonBody);
+
+        // HTTP Content
+        TempBlob.CreateOutStream(OutStr);
+        OutStr.Write(JsonBody);
+        TempBlob.CreateInStream(InStr);
+
+        Content.WriteFrom(JsonBody);
         Content.GetHeaders(ContentHeaders);
         ContentHeaders.Clear();
-        ContentHeaders.Add('Content-Type', 'application/xml');
+        ContentHeaders.Add('Content-Type', 'application/json');
 
-        // Set Authorization and accept headers on the request
-        Request.GetHeaders(Headers);
-        Headers.Add('Authorization', 'Bearer ' + Token);
-        Headers.Add('accept', 'application/json');
 
-        // 4️⃣ Prepare request
+        // Request
         Request.Method := 'POST';
         Request.SetRequestUri(Setup."Base URL" + '/api/v1/documents/send');
         Request.Content := Content;
 
-        // 5️⃣ Send
+        Request.GetHeaders(Headers);
+
+        // ✅ CLEAN TOKEN
+        // Token := DelChr(Token, '<>', ' ' + Format(13) + Format(10));
+
+        Headers.Remove('Authorization');
+        Headers.Add('Authorization', StrSubstNo('Bearer %1', Token));
+
+        Headers.Remove('Accept');
+        Headers.Add('Accept', 'application/json');
+
+        // Send
         Client.Send(Request, Response);
 
-        if not Response.IsSuccessStatusCode() then
-            Error('Send failed. HTTP %1', Response.HttpStatusCode());
+        If not Response.IsSuccessStatusCode() then begin
+            Response.Content.ReadAs(ResponseText);
+            Error('Send failed. HTTP %1\%2', Response.HttpStatusCode(), ResponseText);
+        end else begin
+            Response.Content.ReadAs(ResponseText);
+            if Setup."Show Message" then
+                Message(ResponseText);
 
-        // ✅ 6️⃣ MARK AS SENT (ONLY ON SUCCESS)
-        SIH."Invoice Send" := true;
-        SIH."Invoice Send DateTime" := CurrentDateTime();
-        SIH.Modify();
-
-        // Download the XML file
-        TempBlob.CreateOutStream(OutStr);
-        OutStr.Write(XmlBody);
-        TempBlob.CreateInStream(InStr);
-        DownloadFromStream(InStr, 'application/xml', '', 'Invoice_' + SIH."No." + '.xml', ToFile);
-
-        Message('Posted Sales Invoice %1 successfully sent and XML downloaded.', SIH."No.");
+            SIH."Invoice Send" := true;
+            SIH."Invoice Send DateTime" := CurrentDateTime();
+            SIH.Modify();
+        end;
     end;
 
-    procedure BuildInvoiceXmlFromPSI(SIH: Record "Sales Invoice Header"): Text
+    local procedure GenerateInvoiceXML(SIH: Record "Sales Invoice Header"): Text
     var
-        XmlDoc: XmlDocument;
-        Root, Header, Parties, Lines, Summary : XmlElement;
-        SIL: Record "Sales Invoice Line";
-        LineNode, LineItem : XmlElement;
+        InvoiceXmlPort: XmlPort Invoice;
+        TempBlob: Codeunit "Temp Blob";
+        OutStr: OutStream;
+        InStr: InStream;
         XmlText: Text;
-        LineCount: Integer;
-        TotalTax: Decimal;
+        JO: JsonObject;
     begin
-        XmlDoc := XmlDocument.Create();
-
-        Root := XmlElement.Create('Invoice');
-        XmlDoc.Add(Root);
-
-        // ================= HEADER =================
-        Header := XmlElement.Create('Invoice-Header');
-        Root.Add(Header);
-
-        AddNodeToParent(Header, 'InvoiceNumber', SIH."No.");
-        AddNodeToParent(Header, 'InvoiceDate', Format(SIH."Posting Date", 0, 9));
-        AddNodeToParent(Header, 'InvoiceCurrency', SIH."Currency Code");
-        AddNodeToParent(Header, 'InvoicePaymentTerms', SIH."Payment Terms Code");
-
-        // ================= PARTIES =================
-        Parties := XmlElement.Create('Invoice-Parties');
-        Root.Add(Parties);
-
-        AddPartyToParent(Parties, 'Buyer', SIH."Bill-to Name");
-        AddPartyToParent(Parties, 'Seller', SIH."Sell-to Customer Name");
-
-        // ================= LINES =================
-        Lines := XmlElement.Create('Invoice-Lines');
-        Root.Add(Lines);
-
-        SIL.SetRange("Document No.", SIH."No.");
-        SIL.SetRange(Type, SIL.Type::Item);
-
-        LineCount := 0;
-        TotalTax := 0;
-        if SIL.FindSet() then
-            repeat
-                LineNode := XmlElement.Create('Line');
-                Lines.Add(LineNode);
-
-                LineItem := XmlElement.Create('Line-Item');
-                LineNode.Add(LineItem);
-
-                AddNodeToParent(LineItem, 'LineNumber', Format(SIL."Line No."));
-                AddNodeToParent(LineItem, 'ItemDescription', SIL.Description);
-                AddNodeToParent(LineItem, 'InvoiceQuantity', Format(SIL.Quantity, 0, 9));
-                AddNodeToParent(LineItem, 'InvoiceUnitNetPrice', Format(SIL."Unit Price", 0, 9));
-                AddNodeToParent(LineItem, 'NetAmount', Format(SIL."Line Amount", 0, 9));
-                AddNodeToParent(LineItem, 'TaxAmount', Format(SIL."Amount Including VAT" - SIL."Line Amount", 0, 9));
-                LineCount += 1;
-                TotalTax += (SIL."Amount Including VAT" - SIL."Line Amount");
-            until SIL.Next() = 0;
-
-        // ================= SUMMARY =================
-        Summary := XmlElement.Create('Invoice-Summary');
-        Root.Add(Summary);
-
-        AddNodeToParent(Summary, 'TotalLines', Format(LineCount));
-        AddNodeToParent(Summary, 'TotalNetAmount', Format(SIH."Amount", 0, 9));
-        AddNodeToParent(Summary, 'TotalTaxAmount', Format(TotalTax, 0, 9));
-        AddNodeToParent(Summary, 'TotalGrossAmount', Format(SIH."Amount Including VAT", 0, 9));
-
-        XmlDoc.WriteTo(XmlText);
+        InvoiceXmlPort.SetParameter(SIH."No.");
+        TempBlob.CreateOutStream(OutStr);
+        InvoiceXmlPort.SetDestination(OutStr);
+        InvoiceXmlPort.Export();
+        TempBlob.CreateInStream(InStr);
+        InStr.Read(XmlText);
         exit(XmlText);
     end;
-
-    local procedure AddNodeToParent(Parent: XmlElement; Name: Text; Value: Text)
-    var
-        Node: XmlElement;
-    begin
-        Node := XmlElement.Create(Name);
-        Node.Add(Value);
-        Parent.Add(Node);
-    end;
-
-    local procedure AddPartyToParent(Parent: XmlElement; PartyName: Text; PartyDisplayName: Text)
-    var
-        Party: XmlElement;
-    begin
-        Party := XmlElement.Create(PartyName);
-        Parent.Add(Party);
-        AddNodeToParent(Party, 'Name', PartyDisplayName);
-        AddNodeToParent(Party, 'Country', 'PL');
-    end;
-
 }

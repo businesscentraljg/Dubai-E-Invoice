@@ -26,12 +26,17 @@ table 50000 "Invoice Setup"
         {
             Caption = 'Bearer Token';
             Editable = false;
+            ExtendedDatatype = Masked;
         }
 
         field(6; "Token Expiry"; DateTime)
         {
             Caption = 'Token Expiry';
             Editable = false;
+        }
+        field(7; "Show Message"; Boolean)
+        {
+            Caption = 'Show Message';
         }
     }
     keys

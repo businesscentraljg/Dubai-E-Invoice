@@ -34,6 +34,10 @@ page 50000 "Invoice Setup"
                 {
                     ToolTip = 'Specifies the value of the Token Expiry field.', Comment = '%';
                 }
+                field("Show Message"; Rec."Show Message")
+                {
+                    ToolTip = 'Specifies whether to show messages during operations.', Comment = '%';
+                }
             }
         }
     }

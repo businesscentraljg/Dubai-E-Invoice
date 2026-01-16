@@ -55,8 +55,6 @@ codeunit 50000 "Authenticate Management"
         InvoiceSetup."Token Expiry" := CurrentDateTime() + (50 * 60 * 1000);
         InvoiceSetup.Modify();
 
-        Message('Token generated successfully. Expiry: %1', InvoiceSetup."Token Expiry");
-
         exit(Token);
     end;
 

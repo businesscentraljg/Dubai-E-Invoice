@@ -1,7 +1,7 @@
 page 50001 "User Subscription"
 {
     ApplicationArea = All;
-    Caption = 'User Subscription';
+    Caption = 'User Subscriptions';
     PageType = List;
     SourceTable = "User Subscription";
     UsageCategory = Lists;

@@ -1,7 +1,7 @@
 page 50000 "Invoice Setup"
 {
     ApplicationArea = All;
-    Caption = 'Invoice Setup';
+    Caption = 'E-Invoice Setup';
     PageType = Card;
     SourceTable = "Invoice Setup";
     UsageCategory = Administration;

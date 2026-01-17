@@ -6,7 +6,7 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
         {
             group(InvoiceProcessing)
             {
-                Caption = 'Invoice Processing';
+                Caption = 'E-Invoice Processing';
 
                 field("Invoice Send"; Rec."Invoice Send")
                 {

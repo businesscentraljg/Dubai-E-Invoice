@@ -3,11 +3,8 @@ page 50002 "Sent Documents"
     ApplicationArea = All;
     Caption = 'Sent Documents';
     PageType = List;
-    SourceTable = "Sent Document Header";
+    SourceTable = "Sent Documents";
     UsageCategory = Lists;
-    CardPageId = "Sent Document";
-    Editable = false;
-    RefreshOnActivate = true;
 
     layout
     {
@@ -15,41 +12,54 @@ page 50002 "Sent Documents"
         {
             repeater(General)
             {
-                field("Entry No."; Rec."Entry No.")
+
+                field("Message Id"; Rec."Message Id")
                 {
-                    ToolTip = 'Specifies the value of the Entry No. field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Message Id field.', Comment = '%';
                 }
-                field("Config Type"; Rec."Config Type")
+                field("Processing Status"; Rec."Processing Status")
                 {
-                    ToolTip = 'Specifies the value of the Config Type field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Processing Status field.', Comment = '%';
                 }
-                field("Config Id"; Rec."Config Id")
+                field("Web Doc Id"; Rec."Web Doc Id")
                 {
-                    ToolTip = 'Specifies the value of the Config Id field.', Comment = '%';
-                }
-                field("Specification Business Type"; Rec."Specification Business Type")
-                {
-                    ToolTip = 'Specifies the value of the Specification Business Type field.', Comment = '%';
-                }
-                field("Control Number"; Rec."Control Number")
-                {
-                    ToolTip = 'Specifies the value of the Control Number field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Web Doc Id field.', Comment = '%';
                 }
                 field("Submission Id"; Rec."Submission Id")
                 {
                     ToolTip = 'Specifies the value of the Submission Id field.', Comment = '%';
                 }
-                field("Invoice No."; Rec."Invoice No.")
+                field("Control Number"; Rec."Control Number")
                 {
-                    ToolTip = 'Specifies the value of the Invoice No. field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Control Number field.', Comment = '%';
                 }
-                field("Customer No."; Rec."Customer No.")
+                field("Destination Name"; Rec."Destination Name")
                 {
-                    ToolTip = 'Specifies the value of the Customer No. field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Destination Name field.', Comment = '%';
                 }
-                field("Last API Call DateTime"; Rec."Last API Call DateTime")
+                field("Destination Alias"; Rec."Destination Alias")
                 {
-                    ToolTip = 'Specifies the value of the Last API Call DateTime field.', Comment = '%';
+                    ToolTip = 'Specifies the value of the Destination Alias field.', Comment = '%';
+                }
+                field("Destination Qualifier"; Rec."Destination Qualifier")
+                {
+                    ToolTip = 'Specifies the value of the Destination Qualifier field.', Comment = '%';
+                }
+                field("Compression Type"; Rec."Compression Type")
+                {
+                    ToolTip = 'Specifies the value of the Compression Type field.', Comment = '%';
+                }
+                field("Processing Date"; Rec."Processing Date")
+                {
+                    ToolTip = 'Specifies the value of the Processing Date field.', Comment = '%';
+                }
+                field("Raw JSON"; Rec."Raw JSON")
+                {
+                    ToolTip = 'Specifies the value of the Raw JSON field.', Comment = '%';
+                }
+                field("Entry No."; Rec."Entry No.")
+                {
+                    ToolTip = 'Specifies the value of the Entry No. field.', Comment = '%';
                 }
             }
         }

@@ -45,38 +45,75 @@ page 50000 "Invoice Setup"
     {
         area(Processing)
         {
-            action(GenerateToken)
+            group(Process)
             {
-                Caption = 'Generate Token';
-                Image = Refresh;
-                ApplicationArea = All;
-                Promoted = true;
-                PromotedCategory = Process;
-                PromotedIsBig = true;
-                ToolTip = 'Executes the Generate Token action.';
-                Visible = false;
-                trigger OnAction()
-                var
-                    CU: Codeunit "Authenticate Management";
-                begin
-                    if not Confirm('Do you want to Genrate Token?') then exit;
-                    CU.GetValidToken();
-                end;
+                Caption = 'Process';
+
+                action(GenerateToken)
+                {
+                    Caption = 'Generate Token';
+                    Image = Refresh;
+                    ApplicationArea = All;
+                    ToolTip = 'Executes the Generate Token action.';
+                    Visible = false;
+                    trigger OnAction()
+                    var
+                        CU: Codeunit "Authenticate Management";
+                    begin
+                        if not Confirm('Do you want to Genrate Token?') then exit;
+                        CU.GetValidToken();
+                    end;
+                }
+                action(ImportSubscriptions)
+                {
+                    Caption = 'Import Subscriptions';
+                    Image = Import;
+                    trigger OnAction()
+                    var
+                        SubAPI: Codeunit "Subscription API Import";
+                    begin
+                        SubAPI.ImportSubscriptions();
+                        Message('Subscriptions imported successfully.');
+                    end;
+                }
+                action("Gets details of sent documents")
+                {
+                    Caption = 'Gets details of sent documents';
+                    Image = Import;
+                    trigger OnAction()
+                    var
+                        SubAPI: Codeunit Invoice;
+                    begin
+                        SubAPI.GetSentDocumentDetails();
+                    end;
+                }
             }
-            action(ImportSubscriptions)
+        }
+        area(Promoted)
+        {
+            group(Category_Process)
             {
-                Caption = 'Import Subscriptions';
-                Image = Import;
-                trigger OnAction()
-                var
-                    SubAPI: Codeunit "Subscription API Import";
-                begin
-                    SubAPI.ImportSubscriptions();
-                    Message('Subscriptions imported successfully.');
-                end;
+                Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 1.';
+
+                group(Category_Category6)
+                {
+                    Caption = 'Process', Comment = 'Generated from the PromotedActionCategories property index 5.';
+                    actionref(GenerateToken_Category; GenerateToken)
+                    {
+
+                    }
+                    actionref(ImportSubscriptions_Category; ImportSubscriptions)
+                    {
+                    }
+
+                    actionref(Getsdetailsofsentdocuments_Category; "Gets details of sent documents")
+                    {
+                    }
+                }
             }
         }
     }
+
     trigger OnOpenPage()
     begin
         if not Rec.Get() then begin

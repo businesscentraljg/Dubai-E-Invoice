@@ -1,17 +1,14 @@
-table 50003 "Sent Document Line"
+table 50002 "Sent Documents"
 {
     DataClassification = CustomerContent;
-    LookupPageId = "Sent Document Lines";
-    DrillDownPageId = "Sent Document Lines";
-
+    LookupPageId = "Sent Documents";
+    DrillDownPageId = "Sent Documents";
     fields
     {
         field(1; "Entry No."; Integer)
         {
             AutoIncrement = true;
         }
-
-        field(2; "Header Entry No."; Integer) { }
 
         field(3; "Message Id"; Guid) { }
         field(4; "Processing Status"; Boolean) { }
@@ -30,11 +27,15 @@ table 50003 "Sent Document Line"
         {
             SubType = Memo;
         }
+        field(14; "Config Type"; Integer) { }
+        field(15; "Config Id"; Integer) { }
+
+        field(16; "Specification Business Type"; Code[10]) { }
+
     }
 
     keys
     {
         key(PK; "Entry No.") { Clustered = true; }
-        key(Header; "Header Entry No.") { }
     }
 }

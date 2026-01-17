@@ -86,32 +86,6 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                         CU.CheckPostedSalesInvoiceSentStatus(Rec);
                     end;
                 }
-                action("Get Sent Document Details")
-                {
-                    ApplicationArea = All;
-                    Image = Refresh;
-
-                    trigger OnAction()
-                    var
-                        ApiMgt: Codeunit Invoice;
-                    begin
-                        ApiMgt.GetSentDocumentDetails(Rec."No.");
-                    end;
-                }
-                action("View Sent Documents")
-                {
-                    ApplicationArea = All;
-                    Image = List;
-
-                    trigger OnAction()
-                    var
-                        SentHdr: Record "Sent Document Header";
-                    begin
-                        SentHdr.Reset();
-                        SentHdr.SetRange("Invoice No.", Rec."No.");
-                        Page.Run(Page::"Sent Documents", SentHdr);
-                    end;
-                }
             }
         }
         addafter(Category_Process)
@@ -127,12 +101,6 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                 {
                 }
                 actionref(CheckSentStatus_Promoted; "Checks the state of sent document")
-                {
-                }
-                actionref(GetSentDocumentDetails_Promoted; "Get Sent Document Details")
-                {
-                }
-                actionref(ViewSentDocuments_Promoted; "View Sent Documents")
                 {
                 }
             }

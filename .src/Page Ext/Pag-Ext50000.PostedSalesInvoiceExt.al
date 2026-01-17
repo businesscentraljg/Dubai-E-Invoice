@@ -38,7 +38,7 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
     }
     actions
     {
-        addlast(Processing)
+        addafter(IncomingDocument)
         {
             group(InvoiceActions)
             {
@@ -49,8 +49,6 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                     Caption = 'Send Document';
                     Image = SendTo;
                     ApplicationArea = All;
-                    Promoted = true;
-                    PromotedCategory = Process;
 
                     trigger OnAction()
                     var
@@ -65,9 +63,6 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                     Caption = 'Download XML';
                     ToolTip = 'Download XML';
                     Image = Download;
-                    Promoted = true;
-                    PromotedCategory = Process;
-                    PromotedIsBig = true;
 
                     trigger OnAction()
                     var
@@ -82,8 +77,7 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                     Caption = 'Check Sent Status';
                     ToolTip = 'Check Sent Status';
                     Image = Refresh;
-                    Promoted = true;
-                    PromotedCategory = Process;
+
 
                     trigger OnAction()
                     var
@@ -92,8 +86,57 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                         CU.CheckPostedSalesInvoiceSentStatus(Rec);
                     end;
                 }
-            }
+                action("Get Sent Document Details")
+                {
+                    ApplicationArea = All;
+                    Image = Refresh;
 
+                    trigger OnAction()
+                    var
+                        ApiMgt: Codeunit Invoice;
+                    begin
+                        ApiMgt.GetSentDocumentDetails(Rec."No.");
+                        Message('Sent document details retrieved successfully.');
+                    end;
+                }
+                action("View Sent Documents")
+                {
+                    ApplicationArea = All;
+                    Image = List;
+
+                    trigger OnAction()
+                    var
+                        SentHdr: Record "Sent Document Header";
+                    begin
+                        SentHdr.Reset();
+                        SentHdr.SetRange("Invoice No.", Rec."No.");
+                        Page.Run(Page::"Sent Documents", SentHdr);
+                    end;
+                }
+            }
+        }
+        addafter(Category_Process)
+        {
+            group("Category_Invoice Approvals")
+            {
+                Caption = 'E-Invoice', Comment = 'Actions related to invoice approvals';
+
+                actionref(DownloadSalesInvoice_Promoted; "Download Sales Invoice XML")
+                {
+                }
+                actionref(SendDocument_Promoted; SendDocument)
+                {
+                }
+                actionref(CheckSentStatus_Promoted; "Checks the state of sent document")
+                {
+                }
+                actionref(GetSentDocumentDetails_Promoted; "Get Sent Document Details")
+                {
+                }
+                actionref(ViewSentDocuments_Promoted; "View Sent Documents")
+                {
+                }
+            }
         }
     }
 }

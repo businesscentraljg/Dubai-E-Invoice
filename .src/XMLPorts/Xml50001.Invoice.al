@@ -57,8 +57,8 @@ xmlport 50001 "Invoice"
                     trigger OnBeforePassVariable()
                     begin
                         if SalesInvoiceHeader."Payment Terms Code" <> '' then begin
-                            RecPaymentTerms.get(SalesInvoiceHeader."Payment Terms Code");
-                            InvoicePaymentTerms := '60';//TOCHECK
+                            RecPaymentTerms.Get(SalesInvoiceHeader."Payment Terms Code");
+                            InvoicePaymentTerms := RecPaymentTerms.Description;
                         end;
                     end;
                 }
@@ -109,7 +109,7 @@ xmlport 50001 "Invoice"
                     {
                         trigger OnBeforePassVariable()
                         begin
-                            DeliveryLocationNumber := '789'; // Customize based on your data
+                            DeliveryLocationNumber := SalesInvoiceHeader."Location Code";
                         end;
                     }
                     textelement(DeliveryDate)
@@ -123,7 +123,7 @@ xmlport 50001 "Invoice"
                     {
                         trigger OnBeforePassVariable()
                         begin
-                            DespatchNumber := '123';
+                            DespatchNumber := SalesInvoiceHeader."No.";
                         end;
                     }
                 }
@@ -181,7 +181,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'ILN';
                         trigger OnBeforePassVariable()
                         begin
-                            BuyerILN := '0000735700008';
+                            BuyerILN := RecCustomer.ILN;
                         end;
                     }
                     textelement(BuyerTaxID)
@@ -189,7 +189,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'TaxID';
                         trigger OnBeforePassVariable()
                         begin
-                            BuyerTaxID := 'NL4495445B01';
+                            BuyerTaxID := RecCustomer."VAT Registration No.";
                         end;
                     }
                     textelement(BuyerName)
@@ -241,7 +241,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'ILN';
                         trigger OnBeforePassVariable()
                         begin
-                            PayerILN := '0000735700008';
+                            PayerILN := RecCustomer.ILN;
                         end;
                     }
                     textelement(PayerTaxID)
@@ -249,7 +249,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'TaxID';
                         trigger OnBeforePassVariable()
                         begin
-                            PayerTaxID := 'NL4495445B01';
+                            PayerTaxID := RecCustomer."VAT Registration No.";
                         end;
                     }
                     textelement(PayerName)
@@ -301,7 +301,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'ILN';
                         trigger OnBeforePassVariable()
                         begin
-                            InvoiceILN := '0000735700008';
+                            InvoiceILN := RecCustomer.ILN;
                         end;
                     }
                     textelement(InvoiceTaxID)
@@ -309,7 +309,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'TaxID';
                         trigger OnBeforePassVariable()
                         begin
-                            InvoiceTaxID := 'NL4495445B01';
+                            InvoiceTaxID := RecCustomer."VAT Registration No.";
                         end;
                     }
                     textelement(InvoiceName)
@@ -361,7 +361,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'ILN';
                         trigger OnBeforePassVariable()
                         begin
-                            SellerILN := '0000735700008';
+                            SellerILN := RecCompanyInformation.ILN;
                         end;
                     }
                     textelement(SellerTaxID)
@@ -369,7 +369,7 @@ xmlport 50001 "Invoice"
                         XmlName = 'TaxID';
                         trigger OnBeforePassVariable()
                         begin
-                            SellerTaxID := 'NL4495445B01';
+                            SellerTaxID := RecCompanyInformation."VAT Registration No.";
                         end;
                     }
                     textelement(SellerCodeByBuyer)

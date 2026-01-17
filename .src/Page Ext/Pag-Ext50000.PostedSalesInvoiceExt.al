@@ -96,7 +96,6 @@ pageextension 50000 "Posted Sales Invoice Ext" extends "Posted Sales Invoice"
                         ApiMgt: Codeunit Invoice;
                     begin
                         ApiMgt.GetSentDocumentDetails(Rec."No.");
-                        Message('Sent document details retrieved successfully.');
                     end;
                 }
                 action("View Sent Documents")

@@ -257,6 +257,10 @@ codeunit 50001 "Invoice"
         // --- 3. Get bearer token ---
         BearerToken := AuthCU.GetValidToken();
 
+        SentHdr.SetRange("Invoice No.", PostedInvoiceNo);
+        if SentHdr.FindFirst() then
+            exit; // already have details
+
         // --- 4. Create header record ---
         SentHdr.Reset();
         if SentHdr.FindLast() then

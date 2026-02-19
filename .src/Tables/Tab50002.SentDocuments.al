@@ -31,11 +31,14 @@ table 50002 "Sent Documents"
         field(15; "Config Id"; Integer) { }
 
         field(16; "Specification Business Type"; Code[10]) { }
+        field(17; Confirmed; Boolean) { }
+        field(18; "Confirmed At"; DateTime) { }
 
     }
 
     keys
     {
         key(PK; "Entry No.") { Clustered = true; }
+        key(ConfigDoc; "Config Type", "Config Id", "Web Doc Id") { }
     }
 }

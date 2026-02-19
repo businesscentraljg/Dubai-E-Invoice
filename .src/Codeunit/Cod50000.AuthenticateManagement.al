@@ -4,8 +4,7 @@ codeunit 50000 "Authenticate Management"
     var
         InvoiceSetup: Record "Invoice Setup";
     begin
-        if not InvoiceSetup.Get() then
-            Error('Invoice Setup not found.');
+        GetSetup(InvoiceSetup);
 
         if (InvoiceSetup."Bearer Token" <> '') and
            (InvoiceSetup."Token Expiry" > CurrentDateTime()) then
@@ -26,8 +25,7 @@ codeunit 50000 "Authenticate Management"
         ResponseText: Text;
         Token: Text;
     begin
-        if not InvoiceSetup.Get() then
-            Error('Invoice Setup not found.');
+        GetSetup(InvoiceSetup);
 
         //Build request JSON
         JsonRequest.Add('Login', InvoiceSetup.Login);
@@ -52,11 +50,21 @@ codeunit 50000 "Authenticate Management"
         Token := DelChr(ResponseText, '=', '"');
 
         InvoiceSetup."Bearer Token" := Token;
-        InvoiceSetup."Token Expiry" := CurrentDateTime() + (50 * 60 * 1000);
+        if InvoiceSetup."Token TTL (Minutes)" <= 0 then
+            InvoiceSetup."Token TTL (Minutes)" := 50;
+        InvoiceSetup."Token Expiry" := CurrentDateTime() + (InvoiceSetup."Token TTL (Minutes)" * 60 * 1000);
         InvoiceSetup.Modify();
 
         exit(Token);
     end;
 
+    local procedure GetSetup(var InvoiceSetup: Record "Invoice Setup")
+    begin
+        if InvoiceSetup.Get() then
+            exit;
+        if InvoiceSetup.Get('') then
+            exit;
+        Error('Invoice Setup not found.');
+    end;
 
 }

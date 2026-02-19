@@ -57,6 +57,14 @@ page 50002 "Sent Documents"
                 {
                     ToolTip = 'Specifies the value of the Raw JSON field.', Comment = '%';
                 }
+                field(Confirmed; Rec.Confirmed)
+                {
+                    ToolTip = 'Specifies whether this document details row was confirmed back to EDI API.';
+                }
+                field("Confirmed At"; Rec."Confirmed At")
+                {
+                    ToolTip = 'Specifies confirmation timestamp.';
+                }
                 field("Entry No."; Rec."Entry No.")
                 {
                     ToolTip = 'Specifies the value of the Entry No. field.', Comment = '%';

@@ -28,7 +28,8 @@ It covers:
 1. Search for `E-Invoice Setup`.
 2. Open page `Invoice Setup` (`.src/Pages/Pag50000.InvoiceSetup.al`).
 
-`[BC SCREENSHOT PLACEHOLDER: E-Invoice Setup Card - Empty/New]`
+<img width="1524" height="709" alt="image" src="https://github.com/user-attachments/assets/d81fc9ca-d431-4769-9b77-8f256553cde0" />
+
 
 ### 3.2 Fill Connection Fields
 Populate:
@@ -38,14 +39,19 @@ Populate:
 - `Token TTL (Minutes)` (recommended: `50`)
 - `Show Message` (recommended: `true` for demo)
 
-`[BC SCREENSHOT PLACEHOLDER: Connection Fields Filled]`
+<img width="1524" height="709" alt="image" src="https://github.com/user-attachments/assets/26cbac7a-2b4d-47e5-9f3b-2df9b9887ef5" />
+
 
 ### 3.3 Import Subscriptions
 1. Click `Import Subscriptions`.
 2. Verify records in `User Subscriptions` list.
 
-`[BC SCREENSHOT PLACEHOLDER: Import Subscriptions Action]`
-`[BC SCREENSHOT PLACEHOLDER: User Subscriptions List]`
+<img width="1543" height="656" alt="image" src="https://github.com/user-attachments/assets/e2924fe2-6d3b-41e4-bb12-aefad94b2086" />
+
+<img width="1590" height="632" alt="image" src="https://github.com/user-attachments/assets/c6fdecec-96e8-4e67-8f19-c5767ec3e84a" />
+
+<img width="1731" height="702" alt="image" src="https://github.com/user-attachments/assets/94002dcf-2059-4d63-9350-2853db8f43e3" />
+
 
 ### 3.4 Set Default Runtime Values
 In `E-Invoice Setup`, set:
@@ -54,7 +60,7 @@ In `E-Invoice Setup`, set:
 - `Default Business Type` (for demo: `INVOIC`)
 - `Receive Top` (for demo: `50`)
 
-`[BC SCREENSHOT PLACEHOLDER: Default Config and Business Type Fields]`
+<img width="1524" height="709" alt="image" src="https://github.com/user-attachments/assets/26cbac7a-2b4d-47e5-9f3b-2df9b9887ef5" />`
 
 ### 3.5 Configure Auto Processing (Inbound)
 Set:
@@ -62,7 +68,7 @@ Set:
 - `Default Vendor No.`
 - `Default Purch. G/L Account No.`
 
-`[BC SCREENSHOT PLACEHOLDER: Auto Process and Default Posting Fields]`
+<img width="1530" height="653" alt="image" src="https://github.com/user-attachments/assets/cdce6bb3-2cf0-4dca-b401-de2e645933b9" />
 
 ---
 
@@ -73,21 +79,27 @@ Open Vendor Card and maintain:
 - `ILN` (new extension field)
 - `VAT Registration No.` (fallback identifier)
 
-`[BC SCREENSHOT PLACEHOLDER: Vendor Card with ILN]`
+<img width="1673" height="574" alt="image" src="https://github.com/user-attachments/assets/c76f16fb-2f7c-4056-830a-fdbe3b79a6dc" />
+
+<img width="1656" height="719" alt="image" src="https://github.com/user-attachments/assets/e2db9e75-d7fa-4d5a-ae83-3eb459c39507" />
+
 
 ### 4.2 Customer and Company ILN
 Maintain:
 - Customer `ILN`
 - Company Information `ILN`
 
-`[BC SCREENSHOT PLACEHOLDER: Customer Card ILN]`
-`[BC SCREENSHOT PLACEHOLDER: Company Information ILN]`
+<img width="1655" height="635" alt="image" src="https://github.com/user-attachments/assets/29dbf996-e1d8-4e45-814f-00c07f7f4d70" />
+
+<img width="1501" height="687" alt="image" src="https://github.com/user-attachments/assets/8d0aeb9c-1de0-4f64-8b1d-c2c9a0f0ed70" />
+
 
 ### 4.3 User Subscription Assignment
 Open `User Setup` and set:
 - `Subscription Config Id` (used for outbound send/check actions)
 
-`[BC SCREENSHOT PLACEHOLDER: User Setup Subscription Config Id]`
+<img width="1375" height="453" alt="image" src="https://github.com/user-attachments/assets/41d9f56e-be15-4e8f-865c-5a1a837ecfa2" />
+
 
 ---
 
@@ -97,7 +109,8 @@ Open `User Setup` and set:
 1. Open a posted sales invoice.
 2. Go to `E-Invoice Processing` section.
 
-`[BC SCREENSHOT PLACEHOLDER: Posted Sales Invoice - E-Invoice Processing Fields]`
+<img width="1638" height="771" alt="image" src="https://github.com/user-attachments/assets/f67aa989-ef8d-463b-bb12-3711635d9215" />
+
 
 ### 5.2 Send Invoice
 1. Click `Send Document`.
@@ -107,8 +120,10 @@ Open `User Setup` and set:
 - `Control Number`
 - `Submission Id` (if returned)
 
-`[BC SCREENSHOT PLACEHOLDER: Send Document Action]`
-`[BC SCREENSHOT PLACEHOLDER: Invoice Marked as Sent]`
+<img width="1653" height="774" alt="image" src="https://github.com/user-attachments/assets/737509d3-f533-4e3c-87da-21ae06ff9955" />
+
+<img width="1645" height="773" alt="image" src="https://github.com/user-attachments/assets/60b1fc21-fe43-448c-a0ba-7574c6feb187" />
+
 
 ### 5.3 Check Sent Status
 1. Click `Check Sent Status`.
@@ -116,7 +131,10 @@ Open `User Setup` and set:
 - `Sent Status`
 - `Submission Id`
 
-`[BC SCREENSHOT PLACEHOLDER: Check Sent Status Result]`
+<img width="1643" height="783" alt="image" src="https://github.com/user-attachments/assets/f8467b4d-84c7-40fa-860a-d94ab67b4a85" />
+
+<img width="1659" height="789" alt="image" src="https://github.com/user-attachments/assets/87eb1308-6ebd-4baf-ac52-6a2677d5ff02" />
+
 
 ### 5.4 Pull Sent Details and Statuses
 From `E-Invoice Setup`, run:
@@ -124,13 +142,18 @@ From `E-Invoice Setup`, run:
 - `Get sent statuses`
 - `Confirm sent details`
 - `Confirm sent statuses`
+  
+<img width="1537" height="764" alt="image" src="https://github.com/user-attachments/assets/edfdfc5d-3899-4d8a-b72e-582696918fca" />
+
 
 Review pages:
 - `Sent Documents`
 - `Sent Statuses`
 
-`[BC SCREENSHOT PLACEHOLDER: Sent Documents List]`
-`[BC SCREENSHOT PLACEHOLDER: Sent Statuses List]`
+<img width="1743" height="525" alt="image" src="https://github.com/user-attachments/assets/4cba21c2-e795-4bd5-bf50-0bd8d76d3394" />
+
+<img width="1736" height="661" alt="image" src="https://github.com/user-attachments/assets/75bdab6e-3183-44b6-aa7d-895ca698fac1" />
+
 
 ---
 

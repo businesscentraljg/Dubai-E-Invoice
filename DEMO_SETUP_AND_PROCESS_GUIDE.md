@@ -1,4 +1,4 @@
-# Dubai E-Invoice Demo Guide
+# UAE E-Invoice Demo Guide
 
 ## 1. Purpose
 This document is a demo script and setup guide for the Dubai E-Invoice extension.
